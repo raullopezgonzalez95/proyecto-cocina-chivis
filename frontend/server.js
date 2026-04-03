@@ -17,7 +17,7 @@ if (!existsSync(distPath)) {
   process.exit(1);
 }
 
-const API_URL = process.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = process.env.VITE_API_URL || 'http://localhost:5001/api';
 
 // Serve static files from the Vite build output
 // (exclude index.html so the wildcard handler can inject the runtime variable)

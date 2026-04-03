@@ -111,7 +111,7 @@ El sistema ha sido completamente implementado y probado con:
 
 ## 📝 Notas Importantes
 
-- **Puerto del Backend:** 5001 (cambió de 5000 porque estaba ocupado)
+- **Puerto del Backend:** 5001
 - **Puerto del Frontend:** 5173
 - **Base de datos:** Se crea automáticamente al iniciar el backend
 - **Datos de prueba:** Ya hay productos y ventas de ejemplo en la base de datos
