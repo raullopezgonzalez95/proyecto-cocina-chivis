@@ -1,9 +1,9 @@
 import Producto from '../models/Producto.js';
 import { validationResult } from 'express-validator';
 
-export const obtenerProductos = (req, res) => {
+export const obtenerProductos = async (req, res) => {
   try {
-    const productos = Producto.findAll();
+    const productos = await Producto.findAll();
     res.json(productos);
   } catch (error) {
     console.error('Error al obtener productos:', error);
@@ -11,9 +11,9 @@ export const obtenerProductos = (req, res) => {
   }
 };
 
-export const obtenerProductosVisibles = (req, res) => {
+export const obtenerProductosVisibles = async (req, res) => {
   try {
-    const productos = Producto.findVisibles();
+    const productos = await Producto.findVisibles();
     res.json(productos);
   } catch (error) {
     console.error('Error al obtener productos visibles:', error);
@@ -21,10 +21,10 @@ export const obtenerProductosVisibles = (req, res) => {
   }
 };
 
-export const obtenerProducto = (req, res) => {
+export const obtenerProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const producto = Producto.findById(id);
+    const producto = await Producto.findById(id);
 
     if (!producto || !producto.activo) {
       return res.status(404).json({ error: 'Producto no encontrado' });
@@ -37,7 +37,7 @@ export const obtenerProducto = (req, res) => {
   }
 };
 
-export const crearProducto = (req, res) => {
+export const crearProducto = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -45,7 +45,7 @@ export const crearProducto = (req, res) => {
     }
 
     const { nombre, descripcion, precio, visible_en_menu } = req.body;
-    const producto = Producto.create({ nombre, descripcion, precio, visible_en_menu });
+    const producto = await Producto.create({ nombre, descripcion, precio, visible_en_menu });
 
     res.status(201).json(producto);
   } catch (error) {
@@ -54,7 +54,7 @@ export const crearProducto = (req, res) => {
   }
 };
 
-export const actualizarProducto = (req, res) => {
+export const actualizarProducto = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -64,7 +64,7 @@ export const actualizarProducto = (req, res) => {
     const { id } = req.params;
     const { nombre, descripcion, precio, visible_en_menu } = req.body;
 
-    const producto = Producto.update(id, { nombre, descripcion, precio, visible_en_menu });
+    const producto = await Producto.update(id, { nombre, descripcion, precio, visible_en_menu });
 
     if (!producto) {
       return res.status(404).json({ error: 'Producto no encontrado' });
@@ -77,10 +77,10 @@ export const actualizarProducto = (req, res) => {
   }
 };
 
-export const eliminarProducto = (req, res) => {
+export const eliminarProducto = async (req, res) => {
   try {
     const { id } = req.params;
-    const eliminado = Producto.delete(id);
+    const eliminado = await Producto.delete(id);
 
     if (!eliminado) {
       return res.status(404).json({ error: 'Producto no encontrado' });

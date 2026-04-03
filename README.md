@@ -6,7 +6,7 @@ Sistema fullstack completo para gestionar un negocio de comida. Permite administ
 
 ### Backend
 - Node.js + Express
-- SQLite (better-sqlite3)
+- PostgreSQL (pg)
 - express-validator
 
 ### Frontend
@@ -21,7 +21,7 @@ Sistema fullstack completo para gestionar un negocio de comida. Permite administ
 - **Registro de Ventas:** Registrar ventas con fecha, cantidad y notas
 - **Historial de Ventas:** Visualizar todas las ventas con filtros por fecha y producto
 - **Reportes:** Estadísticas de ventas por producto, ingresos totales y más
-- **Persistencia:** Base de datos SQLite con esquema automático
+- **Persistencia:** Base de datos PostgreSQL con esquema automático
 - **UI Moderna:** Interfaz responsive con Tailwind CSS
 
 ## Instalación
@@ -159,8 +159,25 @@ En el root del proyecto:
 ### Backend (.env)
 ```
 PORT=5001
+HOST=localhost
 NODE_ENV=development
-DB_PATH=./database.sqlite
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=cocina_chivis
+```
+
+### Backend Docker (.env.docker)
+```
+NODE_ENV=development
+PORT=5001
+HOST=0.0.0.0
+DB_HOST=postgres
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=password
+DB_NAME=cocina_chivis
 ```
 
 ### Frontend (.env)
@@ -171,3 +188,68 @@ VITE_API_URL=http://localhost:5001/api
 ## Licencia
 
 Este proyecto fue creado para uso personal.
+
+
+
+
+
+
+
+# Docker
+
+## ✅ Implementación Completada: Proyecto Dockerizado
+
+He completado exitosamente la dockerización del proyecto full-stack de cocina Chivis. Aquí está el resumen:
+
+### 🎯 **Lo que se logró:**
+
+1. **Cambio de base de datos**: Migré de SQLite a PostgreSQL para mejor escalabilidad en contenedores
+2. **Arquitectura multi-contenedor**: Backend, frontend y PostgreSQL en contenedores separados
+3. **Configuración para desarrollo**: Hot-reload habilitado con volúmenes montados
+4. **Persistencia de datos**: Volumen nombrado para datos de PostgreSQL
+
+### 🐳 **Servicios corriendo:**
+- **Backend**: `http://localhost:5001` (API REST con Express + PostgreSQL)
+- **Frontend**: `http://localhost:5173` (React + Vite con hot-reload)
+- **PostgreSQL**: `localhost:5432` (base de datos persistente)
+
+### 📁 **Archivos creados/modificados:**
+- docker-compose.yml - Orquestación de servicios
+- Dockerfile - Imagen del backend
+- Dockerfile - Imagen del frontend
+- package.json - Dependencias actualizadas (pg en lugar de better-sqlite3)
+- database.js - Configuración PostgreSQL
+- models - Modelos actualizados para async/await
+- controllers - Controladores actualizados
+- .env.docker - Variables de entorno para Docker
+- .dockerignore files - Optimización de builds
+
+### 🚀 **Cómo usar:**
+
+```bash
+# Construir e iniciar servicios
+docker-compose up --build
+
+# O en background
+docker-compose up -d
+
+# Detener servicios
+docker-compose down
+
+# Ver logs
+docker-compose logs -f
+```
+
+### 🔍 **Verificación realizada:**
+- ✅ Builds exitosos sin errores
+- ✅ Todos los contenedores iniciados correctamente
+- ✅ API backend responde (productos endpoint)
+- ✅ Frontend Vite dev server funcionando
+- ✅ PostgreSQL healthy y accesible
+
+### 📝 **Consideraciones adicionales:**
+- **Migración de datos**: Si tienes datos en SQLite, necesitarás un script para migrarlos a PostgreSQL
+- **Seguridad**: Las credenciales de DB están en .env.docker - no commitear este archivo
+- **Producción**: Este setup es para desarrollo; para prod necesitarías builds optimizados y nginx
+
+¿Quieres que pruebe alguna funcionalidad específica o haga ajustes adicionales?

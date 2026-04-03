@@ -122,7 +122,7 @@ const Menu = () => {
                     {/* Precio */}
                     <div className="text-center">
                       <div className="inline-block bg-gradient-to-r from-primary-500 to-primary-600 text-white px-8 py-3 rounded-full shadow-lg">
-                        <span className="text-3xl font-bold">${producto.precio.toFixed(2)}</span>
+                        <span className="text-3xl font-bold">${producto.precio}</span>
                       </div>
                     </div>
                   </div>

@@ -2,7 +2,7 @@ import db from '../config/database.js';
 
 class Venta {
   // Obtener todas las ventas con información del producto
-  static findAll({ fecha_inicio, fecha_fin, producto_id } = {}) {
+  static async findAll({ fecha_inicio, fecha_fin, producto_id } = {}) {
     let query = `
       SELECT
         v.*,
@@ -15,60 +15,61 @@ class Venta {
     const params = [];
 
     if (fecha_inicio) {
-      query += ' AND v.fecha >= ?';
+      query += ' AND v.fecha >= $' + (params.length + 1);
       params.push(fecha_inicio);
     }
 
     if (fecha_fin) {
-      query += ' AND v.fecha <= ?';
+      query += ' AND v.fecha <= $' + (params.length + 1);
       params.push(fecha_fin);
     }
 
     if (producto_id) {
-      query += ' AND v.producto_id = ?';
+      query += ' AND v.producto_id = $' + (params.length + 1);
       params.push(producto_id);
     }
 
     query += ' ORDER BY v.fecha DESC, v.created_at DESC';
 
-    const stmt = db.prepare(query);
-    return stmt.all(...params);
+    const result = await db.query(query, params);
+    return result.rows;
   }
 
   // Obtener venta por ID
-  static findById(id) {
-    const stmt = db.prepare(`
+  static async findById(id) {
+    const result = await db.query(`
       SELECT
         v.*,
         p.nombre as producto_nombre,
         p.descripcion as producto_descripcion
       FROM ventas v
       JOIN productos p ON v.producto_id = p.id
-      WHERE v.id = ?
-    `);
-    return stmt.get(id);
+      WHERE v.id = $1
+    `, [id]);
+    return result.rows[0];
   }
 
   // Crear nueva venta
-  static create({ producto_id, cantidad, precio_unitario, fecha, notas }) {
+  static async create({ producto_id, cantidad, precio_unitario, fecha, notas }) {
     const total = cantidad * precio_unitario;
-    const stmt = db.prepare(`
+    const result = await db.query(`
       INSERT INTO ventas (producto_id, cantidad, precio_unitario, total, fecha, notas)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(producto_id, cantidad, precio_unitario, total, fecha, notas);
-    return this.findById(result.lastInsertRowid);
+      VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING *
+    `, [producto_id, cantidad, precio_unitario, total, fecha, notas]);
+
+    // Obtener con información del producto
+    return this.findById(result.rows[0].id);
   }
 
   // Eliminar venta
-  static delete(id) {
-    const stmt = db.prepare('DELETE FROM ventas WHERE id = ?');
-    const result = stmt.run(id);
-    return result.changes > 0;
+  static async delete(id) {
+    const result = await db.query('DELETE FROM ventas WHERE id = $1', [id]);
+    return result.rowCount > 0;
   }
 
   // Obtener reporte de ventas por producto
-  static getReporte({ fecha_inicio, fecha_fin } = {}) {
+  static async getReporte({ fecha_inicio, fecha_fin } = {}) {
     let query = `
       SELECT
         p.id,
@@ -85,44 +86,48 @@ class Venta {
     if (fecha_inicio || fecha_fin) {
       query += ' WHERE 1=1';
       if (fecha_inicio) {
-        query += ' AND (v.fecha >= ? OR v.fecha IS NULL)';
+        query += ' AND (v.fecha >= $' + (params.length + 1) + ' OR v.fecha IS NULL)';
         params.push(fecha_inicio);
       }
       if (fecha_fin) {
-        query += ' AND (v.fecha <= ? OR v.fecha IS NULL)';
+        query += ' AND (v.fecha <= $' + (params.length + 1) + ' OR v.fecha IS NULL)';
         params.push(fecha_fin);
       }
     }
 
     query += `
       GROUP BY p.id, p.nombre
-      HAVING numero_ventas > 0
+      HAVING COUNT(v.id) > 0
       ORDER BY ingresos_totales DESC
     `;
 
-    const stmt = db.prepare(query);
-    const productos = stmt.all(...params);
+    const productosResult = await db.query(query, params);
 
     // Calcular totales generales
-    const totalStmt = db.prepare(`
+    let totalQuery = `
       SELECT
         COUNT(id) as total_ventas,
         SUM(cantidad) as total_cantidad,
         SUM(total) as total_ingresos
       FROM ventas
       WHERE 1=1
-      ${fecha_inicio ? 'AND fecha >= ?' : ''}
-      ${fecha_fin ? 'AND fecha <= ?' : ''}
-    `);
+    `;
+    const totalParams = [];
 
-    const totalesParams = [];
-    if (fecha_inicio) totalesParams.push(fecha_inicio);
-    if (fecha_fin) totalesParams.push(fecha_fin);
+    if (fecha_inicio) {
+      totalQuery += ' AND fecha >= $' + (totalParams.length + 1);
+      totalParams.push(fecha_inicio);
+    }
+    if (fecha_fin) {
+      totalQuery += ' AND fecha <= $' + (totalParams.length + 1);
+      totalParams.push(fecha_fin);
+    }
 
-    const totales = totalStmt.get(...totalesParams);
+    const totalesResult = await db.query(totalQuery, totalParams);
+    const totales = totalesResult.rows[0] || {};
 
     return {
-      productos,
+      productos: productosResult.rows,
       totales: {
         total_ventas: totales.total_ventas || 0,
         total_cantidad: totales.total_cantidad || 0,

@@ -2,10 +2,10 @@ import Venta from '../models/Venta.js';
 import Producto from '../models/Producto.js';
 import { validationResult } from 'express-validator';
 
-export const obtenerVentas = (req, res) => {
+export const obtenerVentas = async (req, res) => {
   try {
     const { fecha_inicio, fecha_fin, producto_id } = req.query;
-    const ventas = Venta.findAll({ fecha_inicio, fecha_fin, producto_id });
+    const ventas = await Venta.findAll({ fecha_inicio, fecha_fin, producto_id });
     res.json(ventas);
   } catch (error) {
     console.error('Error al obtener ventas:', error);
@@ -13,7 +13,7 @@ export const obtenerVentas = (req, res) => {
   }
 };
 
-export const crearVenta = (req, res) => {
+export const crearVenta = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -23,7 +23,7 @@ export const crearVenta = (req, res) => {
     const { producto_id, cantidad, fecha, notas } = req.body;
 
     // Verificar que el producto existe
-    const producto = Producto.findById(producto_id);
+    const producto = await Producto.findById(producto_id);
     if (!producto || !producto.activo) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
@@ -31,7 +31,7 @@ export const crearVenta = (req, res) => {
     // Usar el precio actual del producto
     const precio_unitario = producto.precio;
 
-    const venta = Venta.create({
+    const venta = await Venta.create({
       producto_id,
       cantidad,
       precio_unitario,
@@ -46,10 +46,10 @@ export const crearVenta = (req, res) => {
   }
 };
 
-export const eliminarVenta = (req, res) => {
+export const eliminarVenta = async (req, res) => {
   try {
     const { id } = req.params;
-    const eliminado = Venta.delete(id);
+    const eliminado = await Venta.delete(id);
 
     if (!eliminado) {
       return res.status(404).json({ error: 'Venta no encontrada' });
@@ -62,10 +62,10 @@ export const eliminarVenta = (req, res) => {
   }
 };
 
-export const obtenerReporte = (req, res) => {
+export const obtenerReporte = async (req, res) => {
   try {
     const { fecha_inicio, fecha_fin } = req.query;
-    const reporte = Venta.getReporte({ fecha_inicio, fecha_fin });
+    const reporte = await Venta.getReporte({ fecha_inicio, fecha_fin });
     res.json(reporte);
   } catch (error) {
     console.error('Error al obtener reporte:', error);

@@ -65,7 +65,7 @@ const VentaForm = ({ onSubmit }) => {
             <option value="">Seleccionar producto...</option>
             {productos.map(producto => (
               <option key={producto.id} value={producto.id}>
-                {producto.nombre} - ${producto.precio.toFixed(2)}
+                {producto.nombre} - ${producto.precio}
               </option>
             ))}
           </select>

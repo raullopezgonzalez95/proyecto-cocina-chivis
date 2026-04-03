@@ -9,6 +9,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const HOST = process.env.HOST || 'localhost';
 
 // Middleware
 app.use(cors());
@@ -42,7 +43,7 @@ app.use((err, req, res, next) => {
 });
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-  console.log(`📝 API disponible en http://localhost:${PORT}/api`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Servidor corriendo en http://${HOST}:${PORT}`);
+  console.log(`📝 API disponible en http://${HOST}:${PORT}/api`);
 });
