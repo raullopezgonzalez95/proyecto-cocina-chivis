@@ -166,10 +166,10 @@ const VentasList = () => {
                       {venta.cantidad}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ${venta.precio_unitario.toFixed(2)}
+                      ${venta.precio_unitario}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-bold text-primary-600">
-                      ${venta.total.toFixed(2)}
+                      ${venta.total}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
                       {venta.notas || '-'}
@@ -218,7 +218,7 @@ const VentasList = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Precio Unit.</p>
-                  <p className="text-lg font-semibold">${venta.precio_unitario.toFixed(2)}</p>
+                  <p className="text-lg font-semibold">${venta.precio_unitario}</p>
                 </div>
               </div>
 
@@ -226,7 +226,7 @@ const VentasList = () => {
                 <div>
                   <p className="text-xs text-gray-500">Total</p>
                   <p className="text-2xl font-bold text-primary-600">
-                    ${venta.total.toFixed(2)}
+                    ${venta.total}
                   </p>
                 </div>
                 <button

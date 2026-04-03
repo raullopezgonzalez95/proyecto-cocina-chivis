@@ -88,7 +88,7 @@ const ReporteVentas = () => {
             </div>
             <div className="card bg-gradient-to-br from-purple-500 to-purple-600 text-white sm:col-span-2 lg:col-span-1">
               <h3 className="text-sm font-medium mb-2 opacity-90">Ingresos Totales</h3>
-              <p className="text-3xl lg:text-4xl font-bold">${reporte.totales.total_ingresos.toFixed(2)}</p>
+              <p className="text-3xl lg:text-4xl font-bold">${reporte.totales.total_ingresos}</p>
             </div>
           </div>
 
@@ -137,10 +137,10 @@ const ReporteVentas = () => {
                           {producto.cantidad_total}
                         </td>
                         <td className="px-6 py-4">
-                          ${producto.precio_promedio.toFixed(2)}
+                          ${producto.precio_promedio}
                         </td>
                         <td className="px-6 py-4 font-bold text-primary-600">
-                          ${producto.ingresos_totales.toFixed(2)}
+                          ${producto.ingresos_totales}
                         </td>
                       </tr>
                     ))
@@ -176,11 +176,11 @@ const ReporteVentas = () => {
                       </div>
                       <div className="bg-white rounded p-2">
                         <p className="text-xs text-gray-500">Precio Prom.</p>
-                        <p className="text-xl font-bold text-purple-600">${producto.precio_promedio.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-purple-600">${producto.precio_promedio}</p>
                       </div>
                       <div className="bg-white rounded p-2">
                         <p className="text-xs text-gray-500">Ingresos</p>
-                        <p className="text-xl font-bold text-primary-600">${producto.ingresos_totales.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-primary-600">${producto.ingresos_totales}</p>
                       </div>
                     </div>
                   </div>

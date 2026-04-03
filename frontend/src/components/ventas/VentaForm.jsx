@@ -45,7 +45,7 @@ const VentaForm = ({ onSubmit }) => {
   };
 
   const total = selectedProducto && formData.cantidad
-    ? (selectedProducto.precio * parseInt(formData.cantidad)).toFixed(2)
+    ? (selectedProducto.precio * parseInt(formData.cantidad))
     : '0.00';
 
   return (

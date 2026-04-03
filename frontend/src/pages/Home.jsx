@@ -72,7 +72,7 @@ const Home = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm opacity-90">Ingresos Hoy</p>
-              <p className="text-3xl font-bold mt-2">${stats.ingresosHoy.toFixed(2)}</p>
+              <p className="text-3xl font-bold mt-2">${stats.ingresosHoy}</p>
             </div>
             <div className="text-5xl opacity-50">💰</div>
           </div>
