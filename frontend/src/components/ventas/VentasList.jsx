@@ -47,10 +47,14 @@ const VentasList = () => {
   };
 
   const formatFecha = (fecha) => {
-    return new Date(fecha + 'T00:00:00').toLocaleDateString('es-MX', {
-      year: 'numeric',
+    const soloFecha = fecha.split('T')[0];
+    const fechaLocal = new Date(soloFecha + 'T00:00:00');
+
+    return fechaLocal.toLocaleDateString('es-MX', {
+      weekday: 'long',
+      day: 'numeric',
       month: 'long',
-      day: 'numeric'
+      year: 'numeric'
     });
   };
 
