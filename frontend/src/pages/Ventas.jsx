@@ -9,11 +9,14 @@ const Ventas = () => {
 
   const handleSubmit = async (data) => {
     try {
+      console.log('Enviando datos de venta:', data);
       await crearVenta(data);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
     } catch (error) {
-      alert('Error al registrar venta');
+      const mensajeError = error.response?.data?.error || error.response?.data?.[0]?.msg || 'Error al registrar venta';
+      console.error('Error al registrar venta:', mensajeError, error.response?.data);
+      alert(mensajeError);
     }
   };
 

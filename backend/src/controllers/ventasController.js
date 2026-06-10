@@ -20,23 +20,36 @@ export const crearVenta = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { producto_id, cantidad, fecha, notas } = req.body;
+    const { es_venta_libre, producto_id, cantidad, fecha, notas, descripcion, precio_unitario } = req.body;
 
-    // Verificar que el producto existe
-    const producto = await Producto.findById(producto_id);
-    if (!producto || !producto.activo) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
+    let precioFinal;
+    let descripcionPersonalizada = null;
+
+    const esVentaLibre = es_venta_libre === true || es_venta_libre === 'true';
+
+    if (esVentaLibre) {
+      // Venta libre: usar precio y descripcion del body
+      if (!descripcion || !precio_unitario) {
+        return res.status(400).json({ error: 'Descripción y precio son requeridos para venta libre' });
+      }
+      precioFinal = parseFloat(precio_unitario);
+      descripcionPersonalizada = descripcion;
+    } else {
+      // Venta normal: verificar que el producto existe
+      const producto = await Producto.findById(producto_id);
+      if (!producto || !producto.activo) {
+        return res.status(404).json({ error: 'Producto no encontrado' });
+      }
+      precioFinal = parseFloat(producto.precio);
     }
 
-    // Usar el precio actual del producto
-    const precio_unitario = producto.precio;
-
     const venta = await Venta.create({
-      producto_id,
+      producto_id: esVentaLibre ? null : producto_id,
       cantidad,
-      precio_unitario,
+      precio_unitario: precioFinal,
       fecha,
-      notas
+      notas,
+      descripcion_personalizada: descripcionPersonalizada
     });
 
     res.status(201).json(venta);

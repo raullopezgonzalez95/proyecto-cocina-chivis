@@ -6,10 +6,10 @@ class Venta {
     let query = `
       SELECT
         v.*,
-        p.nombre as producto_nombre,
+        COALESCE(v.descripcion_personalizada, p.nombre) as producto_nombre,
         p.descripcion as producto_descripcion
       FROM ventas v
-      JOIN productos p ON v.producto_id = p.id
+      LEFT JOIN productos p ON v.producto_id = p.id
       WHERE 1=1
     `;
     const params = [];
@@ -40,23 +40,23 @@ class Venta {
     const result = await db.query(`
       SELECT
         v.*,
-        p.nombre as producto_nombre,
+        COALESCE(v.descripcion_personalizada, p.nombre) as producto_nombre,
         p.descripcion as producto_descripcion
       FROM ventas v
-      JOIN productos p ON v.producto_id = p.id
+      LEFT JOIN productos p ON v.producto_id = p.id
       WHERE v.id = $1
     `, [id]);
     return result.rows[0];
   }
 
   // Crear nueva venta
-  static async create({ producto_id, cantidad, precio_unitario, fecha, notas }) {
+  static async create({ producto_id, cantidad, precio_unitario, fecha, notas, descripcion_personalizada }) {
     const total = cantidad * precio_unitario;
     const result = await db.query(`
-      INSERT INTO ventas (producto_id, cantidad, precio_unitario, total, fecha, notas)
-      VALUES ($1, $2, $3, $4, $5, $6)
+      INSERT INTO ventas (producto_id, cantidad, precio_unitario, total, fecha, notas, descripcion_personalizada)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING *
-    `, [producto_id, cantidad, precio_unitario, total, fecha, notas]);
+    `, [producto_id, cantidad, precio_unitario, total, fecha, notas, descripcion_personalizada || null]);
 
     // Obtener con información del producto
     return this.findById(result.rows[0].id);
@@ -70,7 +70,23 @@ class Venta {
 
   // Obtener reporte de ventas por producto
   static async getReporte({ fecha_inicio, fecha_fin } = {}) {
-    let query = `
+    const params = [];
+    let fechaCondition = '';
+    let fechaConditionParams = '';
+
+    if (fecha_inicio) {
+      fechaCondition += ' AND v.fecha >= $' + (params.length + 1);
+      params.push(fecha_inicio);
+      fechaConditionParams += ' AND fecha >= $' + (params.length);
+    }
+    if (fecha_fin) {
+      fechaCondition += ' AND v.fecha <= $' + (params.length + 1);
+      params.push(fecha_fin);
+      fechaConditionParams += ' AND fecha <= $' + (params.length);
+    }
+
+    // Query para productos del catálogo
+    let productosQuery = `
       SELECT
         p.id,
         p.nombre,
@@ -79,29 +95,34 @@ class Venta {
         SUM(v.total) as ingresos_totales,
         AVG(v.precio_unitario) as precio_promedio
       FROM productos p
-      LEFT JOIN ventas v ON p.id = v.producto_id
-    `;
-    const params = [];
-
-    if (fecha_inicio || fecha_fin) {
-      query += ' WHERE 1=1';
-      if (fecha_inicio) {
-        query += ' AND (v.fecha >= $' + (params.length + 1) + ' OR v.fecha IS NULL)';
-        params.push(fecha_inicio);
-      }
-      if (fecha_fin) {
-        query += ' AND (v.fecha <= $' + (params.length + 1) + ' OR v.fecha IS NULL)';
-        params.push(fecha_fin);
-      }
-    }
-
-    query += `
+      LEFT JOIN ventas v ON p.id = v.producto_id ${fechaCondition ? 'WHERE 1=1' + fechaCondition : ''}
       GROUP BY p.id, p.nombre
       HAVING COUNT(v.id) > 0
       ORDER BY ingresos_totales DESC
     `;
 
-    const productosResult = await db.query(query, params);
+    // Query para ventas libres (producto_id IS NULL)
+    let ventasLibresQuery = `
+      SELECT
+        NULL as id,
+        'Ventas Libres' as nombre,
+        COUNT(*) as numero_ventas,
+        SUM(cantidad) as cantidad_total,
+        SUM(total) as ingresos_totales,
+        AVG(precio_unitario) as precio_promedio
+      FROM ventas
+      WHERE producto_id IS NULL ${fechaConditionParams}
+    `;
+
+    // Combinar ambos resultados
+    let combinedQuery = `
+      SELECT * FROM (${productosQuery}) as productos
+      UNION ALL
+      ${ventasLibresQuery}
+      ORDER BY ingresos_totales DESC
+    `;
+
+    const productosResult = await db.query(combinedQuery, params);
 
     // Calcular totales generales
     let totalQuery = `
@@ -110,20 +131,10 @@ class Venta {
         SUM(cantidad) as total_cantidad,
         SUM(total) as total_ingresos
       FROM ventas
-      WHERE 1=1
+      WHERE 1=1 ${fechaConditionParams}
     `;
-    const totalParams = [];
 
-    if (fecha_inicio) {
-      totalQuery += ' AND fecha >= $' + (totalParams.length + 1);
-      totalParams.push(fecha_inicio);
-    }
-    if (fecha_fin) {
-      totalQuery += ' AND fecha <= $' + (totalParams.length + 1);
-      totalParams.push(fecha_fin);
-    }
-
-    const totalesResult = await db.query(totalQuery, totalParams);
+    const totalesResult = await db.query(totalQuery, params);
     const totales = totalesResult.rows[0] || {};
 
     return {

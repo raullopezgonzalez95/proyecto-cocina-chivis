@@ -19,7 +19,9 @@ services:
       retries: 5
 
   backend:
-    image: cocina-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     container_name: cocina_chivis_backend
     environment:
       NODE_ENV: development
@@ -41,7 +43,9 @@ services:
       - ./backend/src:/app/src
 
   frontend:
-    image: cocina-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     container_name: cocina_chivis_frontend
     environment:
       VITE_API_URL: http://localhost:5001/api

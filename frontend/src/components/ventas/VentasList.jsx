@@ -164,16 +164,23 @@ const VentasList = () => {
                       {formatFecha(venta.fecha)}
                     </td>
                     <td className="px-6 py-4 font-medium">
-                      {venta.producto_nombre}
+                      <div className="flex items-center gap-2">
+                        {venta.producto_id === null && (
+                          <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                            Libre
+                          </span>
+                        )}
+                        <span>{venta.producto_nombre}</span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {venta.cantidad}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ${venta.precio_unitario}
+                      ${Number(venta.precio_unitario).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-bold text-primary-600">
-                      ${venta.total}
+                      ${Number(venta.total).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
                       {venta.notas || '-'}
@@ -205,7 +212,14 @@ const VentasList = () => {
             <div key={venta.id} className="card">
               <div className="flex justify-between items-start mb-3">
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-gray-900">{venta.producto_nombre}</h3>
+                  <div className="flex items-center gap-2">
+                    {venta.producto_id === null && (
+                      <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                        Libre
+                      </span>
+                    )}
+                    <h3 className="text-lg font-bold text-gray-900">{venta.producto_nombre}</h3>
+                  </div>
                   <p className="text-sm text-gray-500 mt-1">
                     📅 {formatFechaCorta(venta.fecha)}
                   </p>
@@ -222,7 +236,7 @@ const VentasList = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-500">Precio Unit.</p>
-                  <p className="text-lg font-semibold">${venta.precio_unitario}</p>
+                  <p className="text-lg font-semibold">${Number(venta.precio_unitario).toFixed(2)}</p>
                 </div>
               </div>
 
@@ -230,7 +244,7 @@ const VentasList = () => {
                 <div>
                   <p className="text-xs text-gray-500">Total</p>
                   <p className="text-2xl font-bold text-primary-600">
-                    ${venta.total}
+                    ${Number(venta.total).toFixed(2)}
                   </p>
                 </div>
                 <button

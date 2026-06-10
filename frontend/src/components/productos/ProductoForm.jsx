@@ -14,7 +14,7 @@ const ProductoForm = ({ producto, onSubmit, onCancel }) => {
         nombre: producto.nombre || '',
         descripcion: producto.descripcion || '',
         precio: producto.precio || '',
-        visible_en_menu: producto.visible_en_menu !== undefined ? producto.visible_en_menu === 1 : true
+        visible_en_menu: producto.visible_en_menu !== undefined ? Boolean(producto.visible_en_menu) : true
       });
     }
   }, [producto]);

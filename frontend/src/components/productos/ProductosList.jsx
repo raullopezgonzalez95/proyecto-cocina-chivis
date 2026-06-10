@@ -106,7 +106,7 @@ const ProductosList = () => {
                       {producto.descripcion || '-'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      ${producto.precio}
+                      ${Number(producto.precio).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {producto.visible_en_menu ? (
@@ -171,7 +171,7 @@ const ProductosList = () => {
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-gray-200">
                 <div className="text-2xl font-bold text-primary-600">
-                  ${producto.precio}
+                  ${Number(producto.precio).toFixed(2)}
                 </div>
                 <div className="flex gap-2">
                   <button

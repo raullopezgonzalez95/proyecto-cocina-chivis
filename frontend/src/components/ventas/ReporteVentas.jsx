@@ -88,7 +88,7 @@ const ReporteVentas = () => {
             </div>
             <div className="card bg-gradient-to-br from-purple-500 to-purple-600 text-white sm:col-span-2 lg:col-span-1">
               <h3 className="text-sm font-medium mb-2 opacity-90">Ingresos Totales</h3>
-              <p className="text-3xl lg:text-4xl font-bold">${reporte.totales.total_ingresos}</p>
+              <p className="text-3xl lg:text-4xl font-bold">${Number(reporte.totales.total_ingresos).toFixed(2)}</p>
             </div>
           </div>
 
@@ -126,9 +126,16 @@ const ReporteVentas = () => {
                     </tr>
                   ) : (
                     reporte.productos.map((producto) => (
-                      <tr key={producto.id} className="hover:bg-gray-50">
+                      <tr key={producto.id || 'libre'} className="hover:bg-gray-50">
                         <td className="px-6 py-4 font-medium">
-                          {producto.nombre}
+                          <div className="flex items-center gap-2">
+                            {producto.id === null && (
+                              <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                                Libre
+                              </span>
+                            )}
+                            {producto.nombre}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           {producto.numero_ventas}
@@ -137,10 +144,10 @@ const ReporteVentas = () => {
                           {producto.cantidad_total}
                         </td>
                         <td className="px-6 py-4">
-                          ${producto.precio_promedio}
+                          ${Number(producto.precio_promedio).toFixed(2)}
                         </td>
                         <td className="px-6 py-4 font-bold text-primary-600">
-                          ${producto.ingresos_totales}
+                          ${Number(producto.ingresos_totales).toFixed(2)}
                         </td>
                       </tr>
                     ))
@@ -157,9 +164,16 @@ const ReporteVentas = () => {
                 </div>
               ) : (
                 reporte.productos.map((producto, index) => (
-                  <div key={producto.id} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-white to-gray-50">
+                  <div key={producto.id || 'libre'} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-white to-gray-50">
                     <div className="flex items-start justify-between mb-3">
-                      <h4 className="text-lg font-bold text-gray-900 flex-1">{producto.nombre}</h4>
+                      <div className="flex items-center gap-2">
+                        {producto.id === null && (
+                          <span className="inline-flex items-center px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                            Libre
+                          </span>
+                        )}
+                        <h4 className="text-lg font-bold text-gray-900">{producto.nombre}</h4>
+                      </div>
                       <span className="text-sm font-medium text-gray-500 bg-gray-200 px-2 py-1 rounded">
                         #{index + 1}
                       </span>
@@ -176,11 +190,11 @@ const ReporteVentas = () => {
                       </div>
                       <div className="bg-white rounded p-2">
                         <p className="text-xs text-gray-500">Precio Prom.</p>
-                        <p className="text-xl font-bold text-purple-600">${producto.precio_promedio}</p>
+                        <p className="text-xl font-bold text-purple-600">${Number(producto.precio_promedio).toFixed(2)}</p>
                       </div>
                       <div className="bg-white rounded p-2">
                         <p className="text-xs text-gray-500">Ingresos</p>
-                        <p className="text-xl font-bold text-primary-600">${producto.ingresos_totales}</p>
+                        <p className="text-xl font-bold text-primary-600">${Number(producto.ingresos_totales).toFixed(2)}</p>
                       </div>
                     </div>
                   </div>
